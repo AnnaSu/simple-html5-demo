@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Simple HTML5 Canvas Demo</title>
+    <link rel="stylesheet" href="main.css">
+</head>
+<body>
+    <div class="wraper">
+        <section class="container">
+            <div class="container__avatar">
+                <canvas class="avatar" id="myCanvas" width="300" height="300"></canvas>
+            </div>
+            <div class="container__info">
+                <h1>Hello</h1>
+                <h3>HTML5 Canvas</h3>
+                <input type="file" id="myFile">
+            </div>
+        </section>
+    </div>
+    <script>
+        var fileDOM = document.getElementById('myFile');
+        fileDOM.addEventListener('change', function () {
+            var img = new Image();
+            img.src = URL.createObjectURL(this.files[0]);
+            img.addEventListener('load', function () {
+                var canvas = document.getElementById('myCanvas');
+                var context = canvas.getContext('2d');
+                var sourceX = 0;
+                var sourceY = 0;
+                var sourceWidth = (this.width > this.height) ? this.height : this.width;
+                var sourceHeight = (this.width > this.height) ? this.height : this.width;
+                var destWidth = 300;
+                var destHeight = 300;
+                var destX = 0;
+                var destY = 0;
+                // set white fill style
+                context.fillStyle = '#fff';
+                context.fillRect(0, 0, canvas.width, canvas.height);
+                context.drawImage(img, sourceX, sourceY, sourceWidth, sourceHeight, destX, destY, destWidth, destHeight);
+                // Polyfill
+                if (!HTMLCanvasElement.prototype.toBlob) {
+                    Object.defineProperty(HTMLCanvasElement.prototype, 'toBlob', {
+                        value: function (callback, type, quality) {
+                            var binStr = atob( this.toDataURL(type, quality).split(',')[1] ),
+                            len = binStr.length,
+                            arr = new Uint8Array(len);
+                            for (var i=0; i<len; i++ ) {
+                                arr[i] = binStr.charCodeAt(i);
+                            }
+                            callback( new Blob( [arr], {type: type || 'image/jpeg'} ) );
+                        }
+                    });
+                }
+            });
+        });
+    </script>
+</body>
+</html>
